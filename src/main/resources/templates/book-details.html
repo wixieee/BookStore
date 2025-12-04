@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::links}, ~{::scripts})}">
+
+<head>
+    <title th:text="${book.name} + ' — ' + #{header.logo}">Деталі книги - BookStore</title>
+    <th:block th:fragment="links">
+        <link rel="stylesheet" th:href="@{/css/book-details.css}">
+    </th:block>
+</head>
+
+<body>
+<main th:fragment="main">
+    <div class="book-details-container">
+        <section class="book-cover-section">
+            <img th:src="${book.imagePath != null ? book.imagePath : '/img/book-placeholder.png'}"
+                 th:alt="${book.name}" class="book-cover">
+        </section>
+
+        <section class="book-info-section">
+            <div class="book-header">
+                <h1 class="book-title-large" th:text="${book.name}">Назва книги</h1>
+                <div class="book-author-large" th:text="${book.author}">Автор книги</div>
+            </div>
+
+            <div class="book-description">
+                <p th:text="${book.description}">Опис книги...</p>
+            </div>
+
+            <div class="book-characteristics">
+                <h3 class="characteristics-title" th:text="#{book.characteristics}">Характеристики</h3>
+                <div class="characteristics-list">
+                    <div class="characteristic-item">
+                        <span class="characteristic-label" th:text="#{book.genre}">Жанр</span>
+                        <span class="characteristic-value" th:text="${book.genre}">Фантастика</span>
+                    </div>
+                    <div class="characteristic-item">
+                        <span class="characteristic-label" th:text="#{book.pages}">Кількість сторінок</span>
+                        <span class="characteristic-value" th:text="${book.pages}">350</span>
+                    </div>
+                    <div class="characteristic-item">
+                        <span class="characteristic-label" th:text="#{book.language}">Мова</span>
+                        <span class="characteristic-value" th:text="${book.language}">Українська</span>
+                    </div>
+                    <div class="characteristic-item">
+                        <span class="characteristic-label" th:text="#{book.ageGroup}">Вікова група</span>
+                        <span class="characteristic-value" th:text="${book.ageGroup}">Молодь</span>
+                    </div>
+                    <div class="characteristic-item">
+                        <span class="characteristic-label" th:text="#{book.publicationDate}">Дата публікації</span>
+                        <span class="characteristic-value" th:text="${book.publicationDate}">2023-01-01</span>
+                    </div>
+                    <div class="characteristic-item" th:if="${book.characteristics}">
+                        <span class="characteristic-label" th:text="#{book.other}">Інше</span>
+                        <span class="characteristic-value" th:text="${book.characteristics}">...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="book-actions-section">
+            <div class="price-block">
+                <span class="price-label" th:text="#{book.price}">Ціна</span>
+                <span class="price-value" th:text="${book.price} + ' ' + #{currency}">250 грн</span>
+            </div>
+
+            <div class="action-buttons">
+
+                <a sec:authorize="!isAuthenticated()" href="/login" class="buy-btn-large" style="text-decoration: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="8" cy="21" r="1"></circle>
+                        <circle cx="19" cy="21" r="1"></circle>
+                        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12">
+                        </path>
+                    </svg>
+                    <span th:text="#{home.buy}">Купити</span>
+                </a>
+
+                <button sec:authorize="hasAuthority('ROLE_EMPLOYEE')" class="buy-btn-large disabled" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="8" cy="21" r="1"></circle>
+                        <circle cx="19" cy="21" r="1"></circle>
+                        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12">
+                        </path>
+                    </svg>
+                    <span th:text="#{home.buy}">Купити</span>
+                </button>
+
+                <form sec:authorize="isAuthenticated() and !hasAuthority('ROLE_EMPLOYEE')" th:action="@{/cart/add}" method="post" style="width: 100%;">
+                    <input type="hidden" name="bookName" th:value="${book.name}">
+                    <input type="hidden" name="bookAuthor" th:value="${book.author}">
+
+                    <button type="submit" class="buy-btn-large">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="8" cy="21" r="1"></circle>
+                            <circle cx="19" cy="21" r="1"></circle>
+                            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12">
+                            </path>
+                        </svg>
+                        <span th:text="#{home.buy}">Купити</span>
+                    </button>
+                </form>
+
+                <a th:href="@{/}" class="back-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5"></path>
+                        <path d="M12 19l-7-7 7-7"></path>
+                    </svg>
+                    <span th:text="#{home.back}">Назад до списку</span>
+                </a>
+            </div>
+        </section>
+    </div>
+</main>
+
+<th:block th:fragment="scripts">
+</th:block>
+</body>
+
+</html>

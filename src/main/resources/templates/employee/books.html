@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::title}, ~{::section}, ~{::links}, ~{})}">
+
+<head>
+    <title th:text="#{header.books}+ ' — ' + #{header.logo}">Керування книгами</title>
+    <th:block th:fragment="links">
+        <link rel="stylesheet" th:href="@{/css/books.css}">
+    </th:block>
+</head>
+
+<body>
+<section th:fragment="section" class="container">
+
+    <div class="header-wrapper">
+        <h1 class="page-title" th:text="#{header.books}">Керування книгами</h1>
+    </div>
+
+    <div class="users-layout">
+
+        <div class="create-employee-section"> <div class="form-card">
+            <h3 class="form-title" th:text="${isEditMode} ? #{book.action.edit} : #{book.action.add}">Add Book</h3>
+
+            <form th:action="@{/employee/books/save}" th:object="${bookForm}" method="post">
+                <input type="hidden" th:field="*{id}">
+                <input type="hidden" name="page" th:value="${currentPage}">
+                <input type="hidden" name="search" th:value="${searchTerm}">
+                <input type="hidden" name="sort" th:value="${sortParam}">
+
+                <div class="form-group">
+                    <label th:text="#{book.name}" class="form-label">Назва</label>
+                    <input type="text" th:field="*{name}" class="form-control" th:errorclass="is-invalid">
+                    <span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label th:text="#{book.author}" class="form-label">Автор</label>
+                    <input type="text" th:field="*{author}" class="form-control" th:errorclass="is-invalid">
+                    <span class="text-danger" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label th:text="#{book.price}" class="form-label">Ціна</label>
+                        <input type="number" step="0.01" th:field="*{price}" class="form-control" th:errorclass="is-invalid">
+                        <span class="text-danger" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></span>
+                    </div>
+                    <div class="form-group">
+                        <label th:text="#{book.pages}" class="form-label">Сторінки</label>
+                        <input type="number" th:field="*{pages}" class="form-control" th:errorclass="is-invalid">
+                        <span class="text-danger" th:if="${#fields.hasErrors('pages')}" th:errors="*{pages}"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label th:text="#{book.genre}" class="form-label">Жанр</label>
+                        <input type="text" th:field="*{genre}" class="form-control" th:errorclass="is-invalid">
+                        <span class="text-danger" th:if="${#fields.hasErrors('genre')}" th:errors="*{genre}"></span>
+                    </div>
+                    <div class="form-group">
+                        <label th:text="#{book.publicationDate}" class="form-label">Дата</label>
+                        <input type="date" th:field="*{publicationDate}" class="form-control" th:errorclass="is-invalid">
+                        <span class="text-danger" th:if="${#fields.hasErrors('publicationDate')}" th:errors="*{publicationDate}"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label th:text="#{book.ageGroup}" class="form-label">Вік</label>
+                        <select th:field="*{ageGroup}" class="control-input form-control" style="border: 1px solid var(--border-color);">
+                            <option th:each="age : ${ageGroups}" th:value="${age}" th:text="${age}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label th:text="#{book.language}" class="form-label">Мова</label>
+                        <select th:field="*{language}" class="control-input form-control" style="border: 1px solid var(--border-color);">
+                            <option th:each="lang : ${languages}" th:value="${lang}" th:text="${lang}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label th:text="#{book.img}" class="form-label">URL фото (/img/...)</label>
+                    <input type="text" th:field="*{imagePath}" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label th:text="#{book.description}" class="form-label">Опис</label>
+                    <textarea th:field="*{description}" class="form-control" rows="3" th:errorclass="is-invalid"></textarea>
+                    <span class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label th:text="#{book.characteristics}" class="form-label">Характеристики</label>
+                    <textarea th:field="*{characteristics}" class="form-control" rows="2" th:errorclass="is-invalid"></textarea>
+                </div>
+
+                <div class="form-actions" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary w-100"
+                            th:text="${isEditMode} ? #{profile.update} : #{button.create}">Save</button>
+
+                    <a th:if="${isEditMode}" th:text="#{book.action.cancel}" th:href="@{/employee/books}" class="btn btn-outline-danger w-100"
+                       style="text-align: center; text-decoration: none;">Cancel</a>
+                </div>
+            </form>
+        </div>
+        </div>
+
+        <div class="clients-list-section">
+
+            <section class="controls-section" style="margin-bottom: 2rem;">
+                <form th:action="@{/employee/books}" method="get" class="control-bar">
+                    <div class="search-wrapper">
+                        <input type="text" name="search" th:value="${searchTerm}" placeholder="Назва або автор..." class="control-input">
+                    </div>
+                    <button type="submit" class="search-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                    </button>
+                </form>
+            </section>
+
+            <div class="books-grid">
+                <div th:each="book : ${books}" class="book-tile">
+
+                    <div class="book-image-container" style="height: 18rem;">
+                        <img th:src="${book.imagePath != null ? book.imagePath : '/img/book-placeholder.png'}" class="book-image">
+                    </div>
+
+                    <div class="book-info">
+                        <h3 class="book-title" th:text="${book.name}">Title</h3>
+                        <p class="book-author" th:text="${book.author}">Author</p>
+                        <span class="book-price" th:text="${book.price} + ' ' + #{currency}">Price</span>
+                    </div>
+
+                    <div class="book-admin-actions">
+                        <a th:text="#{book.action.edit}" th:href="@{/employee/books(editId=${book.id}, page=${currentPage}, search=${searchTerm})}"
+                           class="btn btn-sm btn-outline-success" style="flex: 1; text-align: center; text-decoration: none;">
+                            Редагувати
+                        </a>
+
+                        <form th:action="@{/employee/books/delete/{id}(id=${book.id})}" method="post" style="flex: 1;">
+                            <button th:text="#{book.action.delete}" type="submit" class="btn btn-sm btn-outline-danger w-100">Видалити</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <section class="pagination-section" th:if="${!books.isEmpty() && totalPages > 1}">
+                <div class="pagination">
+                    <a th:href="@{/employee/books(page=${currentPage - 1}, search=${searchTerm})}" class="pagination-btn" th:classappend="${currentPage == 0} ? 'disabled'">&larr;</a>
+                    <div class="pagination-numbers">
+                        <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                            <a th:href="@{/employee/books(page=${i}, search=${searchTerm})}" class="pagination-number" th:classappend="${i == currentPage} ? 'active'" th:text="${i + 1}">1</a>
+                        </th:block>
+                    </div>
+                    <a th:href="@{/employee/books(page=${currentPage + 1}, search=${searchTerm})}" class="pagination-btn" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">&rarr;</a>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</section>
+</body>
+</html>

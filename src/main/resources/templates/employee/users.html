@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::title}, ~{::section}, ~{::links}, ~{::scripts})}">
+
+<head>
+    <title th:text="#{header.users}+ ' — ' + #{header.logo}">Керування користувачами</title>
+    <th:block th:fragment="links">
+        <link rel="stylesheet" th:href="@{/css/users.css}">
+    </th:block>
+</head>
+
+<body>
+<section th:fragment="section" class="container">
+
+    <div class="header-wrapper">
+        <h1 class="page-title" th:text="#{header.users}">Керування користувачами</h1>
+    </div>
+
+    <div class="users-layout">
+
+        <div class="clients-list-section">
+
+            <section class="controls-section">
+                <form th:action="@{/employee/users}" method="get" class="control-bar">
+                    <div class="search-wrapper">
+                        <input type="text" name="search" th:value="${searchTerm}"
+                               th:placeholder="#{users.search.placeholder}" class="control-input search-input">
+                    </div>
+
+                    <div class="sort-wrapper">
+                        <select name="sort" class="control-input sort-select" onchange="this.form.submit()">
+                            <option value="name" th:text="#{register.label.name}" th:selected="${sortParam == 'name'}">Ім'я</option>
+                            <option value="email" th:text="#{label.email}" th:selected="${sortParam == 'email'}">Email</option>
+                            <option value="balance" th:text="#{header.balance}" th:selected="${sortParam == 'balance'}">Баланс</option>
+                        </select>
+                        <svg class="select-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+
+                    <button type="submit" class="search-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                    </button>
+                </form>
+            </section>
+
+            <div th:if="${clients.isEmpty()}" class="empty-state">
+                <h3 th:text="#{users.empty}">Користувачів не знайдено</h3>
+            </div>
+
+            <div th:if="${!clients.isEmpty()}" class="users-grid">
+                <div th:each="client : ${clients}" class="user-card"
+                     th:classappend="${client.blocked} ? 'blocked-card'">
+
+                    <div class="user-info">
+                        <div class="user-header">
+                            <h3 class="user-name" th:text="${client.name}">User Name</h3>
+                            <span th:if="${client.blocked}" class="badge badge-danger" th:text="#{user.status.blocked}">Blocked</span>
+                            <span th:unless="${client.blocked}" class="badge badge-success" th:text="#{user.status.active}">Active</span>
+                        </div>
+                        <p class="user-email" th:text="${client.email}">email@example.com</p>
+                        <p class="user-balance">
+                            <span th:text="#{header.balance} + ':'">Balance:</span>
+                            <span class="balance-amount" th:text="${client.balance} + ' ' + #{currency}">0.00 грн</span>
+                        </p>
+                    </div>
+
+                    <div class="user-actions">
+                        <form th:action="@{/employee/users/client/status}" method="post">
+                            <input type="hidden" name="email" th:value="${client.email}">
+                            <input type="hidden" name="blocked" th:value="${!client.blocked}">
+
+                            <button th:if="${client.blocked}" type="submit" class="btn btn-sm btn-outline-success">
+                                <span th:text="#{action.unblock}">Розблокувати</span>
+                            </button>
+
+                            <button th:unless="${client.blocked}" type="submit" class="btn btn-sm btn-outline-danger">
+                                <span th:text="#{action.block}">Заблокувати</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <section class="pagination-section" th:if="${!clients.isEmpty() && totalPages > 1}">
+                <div class="pagination">
+                    <a th:href="@{/employee/users(page=${currentPage - 1}, sort=${sortParam}, search=${searchTerm})}"
+                       class="pagination-btn" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        <span th:text="#{home.back}">Назад</span>
+                    </a>
+
+                    <div class="pagination-numbers">
+                        <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                            <span th:if="${i == currentPage}" class="pagination-number active" th:text="${i + 1}">1</span>
+                            <a th:unless="${i == currentPage}"
+                               th:href="@{/employee/users(page=${i}, sort=${sortParam}, search=${searchTerm})}"
+                               class="pagination-number" th:text="${i + 1}">2</a>
+                        </th:block>
+                    </div>
+
+                    <a th:href="@{/employee/users(page=${currentPage + 1}, sort=${sortParam}, search=${searchTerm})}"
+                       class="pagination-btn" th:classappend="${currentPage >= totalPages - 1} ? 'disabled' : ''">
+                        <span th:text="#{home.forward}">Вперед</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+                </div>
+            </section>
+        </div>
+
+        <div class="create-employee-section">
+            <div class="form-card">
+                <h3 class="form-title" th:text="#{user.add.employee}">Додати працівника</h3>
+
+                <form th:action="@{/employee/users/add-employee}" th:object="${newEmployee}" method="post">
+                    <input type="hidden" name="page" th:value="${currentPage}">
+                    <input type="hidden" name="search" th:value="${searchTerm}">
+                    <input type="hidden" name="sort" th:value="${sortParam}">
+
+                    <div class="form-group">
+                        <label class="form-label" th:text="#{register.label.name}">Ім'я</label>
+                        <input th:placeholder="#{register.input.name}" type="text" th:field="*{name}" class="form-control"
+                               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+                        <span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" th:text="#{label.email}">Email</label>
+                        <input placeholder="example@email.com" type="email" th:field="*{email}" class="form-control"
+                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
+                        <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" th:text="#{label.phone}">Телефон</label>
+                        <input placeholder="+XXXXXXXXX" type="tel" th:field="*{phone}" class="form-control"
+                               th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid'">
+                        <span class="text-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" th:text="#{label.birthDate}">Дата народження</label>
+                        <input type="date" th:field="*{birthDate}" class="form-control"
+                               th:classappend="${#fields.hasErrors('birthDate')} ? 'is-invalid'">
+                        <span class="text-danger" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" th:text="#{label.password}">Пароль</label>
+                        <div class="password-wrapper">
+                            <input placeholder="••••••••" type="password" th:field="*{password}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'">
+                            <button type="button" class="password-toggle" aria-label="Show password" tabindex="-1">
+                                <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
+                                <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                            </button>
+                        </div>
+                        <span class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" th:text="#{register.label.confirm}">Підтвердіть пароль</label>
+                        <div class="password-wrapper">
+                            <input placeholder="••••••••" type="password" th:field="*{passwordConfirm}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('passwordConfirm')} ? 'is-invalid'">
+                            <button type="button" class="password-toggle" aria-label="Show password" tabindex="-1">
+                                <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
+                                <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                            </button>
+                        </div>
+                        <span class="text-danger" th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" th:text="#{button.create}">Створити</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<th:block th:fragment="scripts">
+    <script th:src="@{/js/password-toggle.js}"></script>
+</th:block>
+</body>
+</html>

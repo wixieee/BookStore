@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::title}, ~{::section}, ~{::links}, ~{})}">
+
+<head>
+    <title th:text="#{header.orders}+ ' — ' + #{header.logo}">Вхідні замовлення</title>
+    <th:block th:fragment="links">
+        <link rel="stylesheet" th:href="@{/css/orders.css}">
+    </th:block>
+</head>
+
+<body>
+<section th:fragment="section" class="container">
+    <div class="header-wrapper">
+        <h1 class="page-title" th:text="#{header.orders}">Вхідні замовлення</h1>
+    </div>
+
+    <section class="controls-section">
+        <form th:action="@{/orders/employee}" method="get" class="control-bar">
+            <div class="search-wrapper">
+                <input type="text" name="search" th:value="${searchTerm}"
+                       th:placeholder="#{orders.search.employee}" class="control-input search-input">
+            </div>
+
+            <div class="sort-wrapper">
+                <select name="sort" class="control-input sort-select" onchange="this.form.submit()">
+                    <option value="date-asc" th:text="#{sort.date.oldest}" th:selected="${sortParam == 'date-asc'}">Старі спочатку</option>
+                    <option value="date-desc" th:text="#{sort.date.newest}" th:selected="${sortParam == 'date-desc'}">Нові спочатку</option>
+                    <option value="price-desc" th:text="#{home.sort.price-desc}" th:selected="${sortParam == 'price-desc'}">Ціна (дорогі)</option>
+                    <option value="price-asc" th:text="#{home.sort.price-asc}" th:selected="${sortParam == 'price-asc'}">Ціна (дешеві)</option>
+                </select>
+                <svg class="select-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+
+            <button type="submit" class="search-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+            </button>
+        </form>
+    </section>
+
+    <div th:if="${orders.isEmpty()}" class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <h3 th:text="#{orders.empty.employee}">Немає нових замовлень</h3>
+    </div>
+
+    <div th:if="${!orders.isEmpty()}" class="orders-list">
+        <div th:each="order : ${orders}" class="order-card">
+
+            <div class="order-header">
+                <div>
+                    <span class="order-id">#<span th:text="${order.id}"></span></span>
+                    <span class="order-date" th:text="${#temporals.format(order.orderDate, 'dd.MM.yyyy HH:mm')}"></span>
+                </div>
+                <div>
+                    <span class="client-email" th:text="${order.clientEmail}">client@mail.com</span>
+                </div>
+            </div>
+
+            <div class="order-body">
+                <div class="order-items">
+                    <div th:each="item : ${order.bookItems}" class="order-item">
+                        <span class="item-name" th:text="${item.bookName}">Назва книги</span>
+                        <span class="item-qty">x<span th:text="${item.quantity}">1</span></span>
+                    </div>
+                </div>
+                <div class="order-total">
+                    <span th:text="#{cart.total}">Разом:</span>
+                    <span th:text="${order.price} + ' ' + #{currency}">0.00 грн</span>
+                </div>
+            </div>
+
+            <div class="order-actions">
+                <form th:action="@{/orders/{id}/confirm(id=${order.id})}" method="post">
+                    <button type="submit" class="btn btn-sm btn-success" th:text="#{order.action.confirm}">Підтвердити</button>
+                </form>
+
+                <form th:action="@{/orders/{id}/decline(id=${order.id})}" method="post">
+                    <button type="submit" class="btn btn-sm btn-danger" th:text="#{order.action.decline}">Відхилити</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <section class="pagination-section" th:if="${!orders.isEmpty() && totalPages > 1}">
+        <div class="pagination">
+            <a th:href="@{/orders/employee(page=${currentPage - 1}, sort=${sortParam}, search=${searchTerm})}"
+               class="pagination-btn" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span th:text="#{home.back}">Назад</span>
+            </a>
+
+            <div class="pagination-numbers">
+                <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <span th:if="${i == currentPage}" class="pagination-number active" th:text="${i + 1}">1</span>
+                    <a th:unless="${i == currentPage}"
+                       th:href="@{/orders/employee(page=${i}, sort=${sortParam}, search=${searchTerm})}"
+                       class="pagination-number" th:text="${i + 1}">2</a>
+                </th:block>
+            </div>
+
+            <a th:href="@{/orders/employee(page=${currentPage + 1}, sort=${sortParam}, search=${searchTerm})}"
+               class="pagination-btn" th:classappend="${currentPage >= totalPages - 1} ? 'disabled' : ''">
+                <span th:text="#{home.forward}">Вперед</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </a>
+        </div>
+        <div class="page-info">
+            <span th:utext="#{home.page.info(${currentPage + 1}, ${totalPages})}">Сторінка 1 з N</span>
+        </div>
+    </section>
+
+</section>
+</body>
+</html>

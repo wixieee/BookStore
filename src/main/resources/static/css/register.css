@@ -1,0 +1,45 @@
+.register-container {
+    max-width: 25rem;
+    margin: 4rem auto;
+    background-color: var(--surface-color);
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.register-header {
+    margin-bottom: 2rem;
+}
+
+.register-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.register-subtitle {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.register-form {
+    text-align: left;
+}
+
+.register-footer {
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.register-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.register-footer a:hover {
+    text-decoration: underline;
+}

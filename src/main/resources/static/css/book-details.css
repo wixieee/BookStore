@@ -1,0 +1,189 @@
+.book-details-container {
+    margin: 0 auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 25rem 1fr 20rem;
+    gap: 3rem;
+    align-items: start;
+}
+
+.book-cover-section {
+    position: sticky;
+    top: 6rem;
+}
+
+.book-cover {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: fill;
+    border-radius: 1rem;
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+}
+
+.book-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.book-info-section p {
+    text-align: justify;
+}
+
+.book-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1.5rem;
+}
+
+.book-title-large {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+}
+
+.book-author-large {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.book-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-color);
+}
+
+.book-characteristics {
+    background: var(--surface-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.characteristics-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+}
+
+.characteristics-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.characteristic-item {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.characteristic-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.characteristic-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.characteristic-value {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.book-actions-section {
+    background: var(--surface-color);
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 6rem;
+}
+
+.price-block {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.price-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.price-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.buy-btn-large {
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-family: var(--font-family);
+}
+
+.buy-btn-large:hover {
+    background: var(--primary-hover);
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.back-link:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-color);
+}
+
+.buy-btn-large.disabled {
+    background-color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.7;
+    pointer-events: none;
+    box-shadow: none;
+    transform: none;
+}
+
+.buy-btn-large.disabled:hover {
+    background-color: var(--text-muted);
+    transform: none;
+    box-shadow: none;
+}
+

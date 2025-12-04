@@ -1,0 +1,132 @@
+.profile-section {
+    padding: 2rem 0;
+}
+
+.profile-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.profile-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.profile-subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.profile-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 auto;
+}
+
+.profile-card {
+    background: var(--surface-color);
+    border-radius: 1rem;
+    width: 50rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: #f9fafb;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.form-hint {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.balance-display {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    background-color: #ecfdf5;
+    border: 1px solid #d1fae5;
+    border-radius: 0.5rem;
+    color: #065f46;
+    width: 100%;
+}
+
+.balance-amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.balance-currency {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.danger-zone {
+    border-color: #fecaca;
+    height: 14rem;
+    width: 35rem;
+}
+
+.danger-zone .card-header {
+    background-color: #fef2f2;
+    border-bottom-color: #fecaca;
+}
+
+.text-danger-header {
+    color: #991b1b;
+}
+
+.danger-text {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.btn-danger-outline {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.875rem;
+
+    background-color: white;
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.btn-danger-outline:hover {
+    background-color: #fef2f2;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}

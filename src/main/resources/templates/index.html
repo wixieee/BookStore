@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::links}, ~{::scripts})}">
+
+<head>
+    <title th:text="#{home.title}">Головна - BookStore</title>
+    <th:block th:fragment="links">
+        <link rel="stylesheet" th:href="@{/css/index.css}">
+    </th:block>
+</head>
+
+<body>
+<main th:fragment="main">
+    <div class="container">
+        <section class="controls-section">
+            <form th:action="@{/}" method="get" class="control-bar">
+                <div class="search-wrapper">
+                    <input type="text" name="search" th:value="${searchTerm}"
+                           th:placeholder="#{home.search.placeholder}" class="control-input search-input">
+                </div>
+
+                <div class="sort-wrapper">
+                    <select name="sort" class="control-input sort-select" onchange="this.form.submit()">
+                        <option value="name" th:text="#{home.sort.name}" th:selected="${sortParam == 'name'}">За назвою</option>
+                        <option value="price-asc" th:text="#{home.sort.price-asc}" th:selected="${sortParam == 'price-asc'}">За ціною (дешеві)</option>
+                        <option value="price-desc" th:text="#{home.sort.price-desc}" th:selected="${sortParam == 'price-desc'}">За ціною (дорогі)</option>
+                        <option value="author" th:text="#{home.sort.author}" th:selected="${sortParam == 'author'}">За автором</option>
+                    </select>
+                    <svg class="select-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+
+                <button type="submit" class="search-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+
+                <input type="hidden" name="size" th:value="${pageSize}">
+            </form>
+        </section>
+
+        <section class="books-section">
+            <div class="books-grid">
+
+                <div class="book-tile" th:each="book : ${books}">
+
+                    <div class="book-image-container">
+                        <a th:href="@{/book/{name}/{author}(name=${book.name}, author=${book.author})}" class="book-link">
+                            <img th:src="${book.imagePath != null ? book.imagePath : '/img/book-placeholder.png'}"
+                                 alt="Book cover" class="book-image">
+                        </a>
+                    </div>
+
+                    <div class="book-info">
+                        <a th:href="@{/book/{name}/{author}(name=${book.name}, author=${book.author})}" class="book-link">
+                            <h3 class="book-title" th:text="${book.name}">Назва книги</h3>
+                        </a>
+
+                        <p class="book-author" th:text="${book.author}">Автор</p>
+
+                        <div class="book-footer">
+                            <span class="book-price" th:text="${book.price} + ' ' + #{currency}">250 грн</span>
+
+                            <a sec:authorize="!isAuthenticated()" href="/login" class="footer-buy-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                            </a>
+
+                            <button sec:authorize="hasAuthority('ROLE_EMPLOYEE')" class="footer-buy-btn disabled" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                            </button>
+
+                            <form sec:authorize="isAuthenticated() and !hasAuthority('ROLE_EMPLOYEE')" th:action="@{/cart/add}" method="post">
+                                <input type="hidden" name="bookName" th:value="${book.name}">
+                                <input type="hidden" name="bookAuthor" th:value="${book.author}">
+
+                                <button type="submit" class="footer-buy-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="empty-state" th:if="${books.isEmpty()}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <h2 th:text="#{home.not-found.title}">Книг не знайдено</h2>
+                <p th:text="#{home.not-found.desc}">Спробуйте змінити параметри пошуку або фільтри</p>
+            </div>
+        </section>
+
+        <section class="pagination-section" th:if="${!books.isEmpty()}">
+            <div class="pagination">
+                <a th:href="@{/(page=${currentPage - 1}, size=${pageSize}, sort=${sortParam}, search=${searchTerm})}"
+                   class="pagination-btn" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <span th:text="#{home.back}">Назад</span>
+                </a>
+
+                <div class="pagination-numbers">
+                    <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                        <span th:if="${i == currentPage}" class="pagination-number active" th:text="${i + 1}">1</span>
+                        <a th:unless="${i == currentPage}"
+                           th:href="@{/(page=${i}, size=${pageSize}, sort=${sortParam}, search=${searchTerm})}"
+                           class="pagination-number" th:text="${i + 1}">2</a>
+                    </th:block>
+                </div>
+
+                <a th:href="@{/(page=${currentPage + 1}, size=${pageSize}, sort=${sortParam}, search=${searchTerm})}"
+                   class="pagination-btn" th:classappend="${currentPage >= totalPages - 1} ? 'disabled' : ''">
+                    <span th:text="#{home.forward}">Вперед</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+            </div>
+            <div class="page-info">
+                <span th:utext="#{home.page.info(${currentPage + 1}, ${totalPages})}">Сторінка 1 з 10</span>
+            </div>
+        </section>
+    </div>
+</main>
+
+<th:block th:fragment="scripts">
+</th:block>
+</body>
+
+</html>
