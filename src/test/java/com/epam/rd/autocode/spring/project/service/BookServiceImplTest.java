@@ -58,7 +58,9 @@ class BookServiceImplTest {
                 "Hardcover",
                 "A story of decadence and excess.",
                 Language.ENGLISH,
-                "/img/gatsby.jpg"
+                "/img/gatsby.jpg",
+                null,
+                null
         );
 
         bookDTO = new BookDTO(
