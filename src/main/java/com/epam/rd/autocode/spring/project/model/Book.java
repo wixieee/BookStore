@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "books")
@@ -38,6 +39,12 @@ public class Book {
     private Language language;
 
     private String imagePath;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookItem> bookItem;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItem;
 
     @Override
     public boolean equals(Object o) {
